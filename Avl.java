@@ -2,7 +2,7 @@ import java.util.ArrayList;
 
 public class Avl {
   private Node root;
-  private int lenght;
+  public int lenght;
   private Comparator comparator;
 
   public Avl(int value) {
@@ -46,16 +46,19 @@ public class Avl {
 
   private void simpleLeftRotation(Node node) {
     // guarde a subárvore direita
-    Node rightSubTree = node.getRightChild();
+    Node rightSubTree = node.getRightChild(); // 16
 
     // Troque a subárvore guardada pela subárvore esquerda da árvore guardada
     if (rightSubTree.hasLeftChild()) {
       node.setRightChild(rightSubTree.getLeftChild());
-      rightSubTree.setParent(node);
+      rightSubTree.getLeftChild().setParent(node);
       rightSubTree.setLeftChild(null);
+    } else {
+      node.setRightChild(null);
     }
 
     // Ponha na subárvore esquerda da subárvore guardada a árvore restante.
+    // System.out.println(node.getRightChild().element());
     rightSubTree.setLeftChild(node);
     if (node.parent() != null) {
       if (node.parent().getLeftChild() == node) 
@@ -68,7 +71,10 @@ public class Avl {
     node.setParent(rightSubTree);
 
     int FB_B = node.getBf();
-    int FB_A = node.getRightChild().getBf();
+    int FB_A = 0;
+
+    if (node.getRightChild() != null) 
+      FB_A = node.getRightChild().getBf();
     
     int FB_B_novo= FB_B + 1 - Math.min(FB_A, 0);
     int FB_A_novo= FB_A + 1 + Math.max(FB_B_novo, 0);
@@ -78,7 +84,6 @@ public class Avl {
     
     if (node == this.root) {
       this.root = rightSubTree;
-      System.out.println(this.root.element());
     }
   }
 
@@ -177,7 +182,6 @@ public class Avl {
     
     if (parent.parent() != null) {
       if (parent.parent().getBf() != 0) {
-        System.out.println("Atualiza o fb do antecessor");
         insertUpdateBf(parent);
       }
     }
@@ -340,7 +344,7 @@ public class Avl {
     else if (isExternal(node))
       return 0;
     else {
-      int height = 0;
+      int height = 1;
       if ((node.getLeftChild() != null) && (node.getRightChild() != null))
         height = Math.max(auxHeight(node.getLeftChild()), auxHeight(node.getRightChild()));
       return height+1;
@@ -348,15 +352,15 @@ public class Avl {
   }
 
   public void show() {
-    int[][] matriz = new int[this.height(this.root)+1][this.lenght];
+    int[][] matriz = new int[this.height(root)+1][this.lenght];
 
     ArrayList<Node> order = new ArrayList<Node>(this.lenght);
-    order = this.inOrder(this.root, order);
+    order = this.inOrder(root, order);
 
     for (int i = 0; i<this.lenght; i++)
       matriz[this.depth(order.get(i))][i] = (int) order.get(i).element();
 
-    for (int line = 0; line<=this.height(this.root); line++) {
+    for (int line = 0; line<=this.height(root); line++) {
       for(int column = 0; column<this.lenght; column++) {
         if (matriz[line][column] == 0)
           System.out.print(" ");
